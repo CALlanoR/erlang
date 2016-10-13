@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 OTP_VERSION=19.1.2
 
+useradd -s /bin/bash -m callanor
+echo "callanor:callanor" | chpasswd
+echo "callanor ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+sed -i "s/PermitRootLogin without-password/PermitRootLogin yes/" /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+sed "s@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g" -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+echo "export VISIBLE=now" >> /etc/profile
+
 apt-get update \
   && apt-get install -y \
          autoconf \
          git \
+         jq \
+         openssh-server \
          build-essential \
          curl \
          libssl-dev \
